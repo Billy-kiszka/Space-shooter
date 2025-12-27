@@ -18,8 +18,8 @@ surf.fill('white')
 #importing an image
 player_surf = pygame.image.load(join('images','player.png')).convert_alpha()
 player_rect = player_surf.get_frect(center = (WINDOW_WIDTH /2, WINDOW_HEIGHT/1.5))
-player_direction = pygame.math.Vector2(1, 1)
-player_speed = 300
+player_direction = pygame.math.Vector2(0,0)
+player_speed = 500
 
 
 star = pygame.image.load(join('images', 'star.png')).convert_alpha()
@@ -37,23 +37,27 @@ while running:
     dt = clock.tick() /1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
-
+            running = False        
+   
     screen.fill("grey")
     #akcje
        
+    keys = pygame.key.get_pressed()
+
+    player_direction.x = int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT])
+    player_direction.y = int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP])
+    player_direction = player_direction.normalize() if player_direction else player_direction
+    player_rect.center += player_direction * dt * player_speed
+
+    recent_keys = pygame.key.get_just_pressed()
+    print('fire laser') if int(recent_keys[pygame.K_SPACE]) else None
+
     for pos in star_pos:
         screen.blit(star, pos)
     
     screen.blit(laser, laser_rect)    
     screen.blit(meteor, meteor_rect)
-    if player_rect.top <= 0 or player_rect.bottom >= WINDOW_HEIGHT:
-        player_direction.y *= -1
     
-    if player_rect.right >= WINDOW_WIDTH or player_rect.left <= 0:
-        player_direction.x *= -1
-
-    player_rect.center += player_direction * player_speed * dt
     screen.blit(player_surf, player_rect)
     
     
